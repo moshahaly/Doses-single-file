@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Anesthesia Drug Calculator</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --background: #ecf0f1;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .app-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .app-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        input, select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+            grid-column: span 2;
+            justify-self: end;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c0392b;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: #ddd;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            background: #ccc;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-contents {
+            min-height: 200px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .drug-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .drug-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .drug-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .dose-item {
+            margin: 0.75rem 0;
+        }
+
+        .dose-item h4 {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .dose-value {
+            font-weight: 500;
+            color: var(--secondary);
+        }
+
+        .preparation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .references-card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .references-card ul {
+            list-style: none;
+        }
+
+        .references-card li {
+            margin: 0.5rem 0;
+            color: var(--text-light);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #27ae60;
+        }
+
+        .toast.error {
+            background: var(--accent);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-primary {
+                grid-column: span 1;
+                justify-self: stretch;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="container">
+            <h1><i class="material-icons">calculate</i> Anesthesia Drug Calculator</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card input-card">
+            <form id="patientForm" class="form-grid">
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" min="0" required placeholder="Years">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight</label>
+                    <input type="number" id="weight" min="0" step="0.1" required placeholder="kg">
+                </div>
+                <div class="form-group">
+                    <label for="height">Height</label>
+                    <input type="number" id="height" min="0" required placeholder="cm">
+                </div>
+                <div class="form-group">
+                    <label>Sex</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="sex" value="male" id="male" checked>
+                            <span>Male</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="sex" value="female" id="female">
+                            <span>Female</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="asa">ASA Status</label>
+                    <select id="asa" required>
+                        <option value="1">1 - Normal healthy</option>
+                        <option value="2">2 - Mild systemic disease</option>
+                        <option value="3">3 - Severe systemic disease</option>
+                        <option value="4">4 - Severe life-threatening</option>
+                        <option value="5">5 - Moribund</option>
+                    </select>
+                </div>
+                <button type="submit" id="calculateBtn" class="btn btn-primary">Calculate Doses</button>
+            </form>
+        </section>
+
+        <section id="resultsSection" class="results-section" style="display: none;">
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="induction">Induction</button>
+                    <button class="tab-btn" data-tab="maintenance">Maintenance</button>
+                    <button class="tab-btn" data-tab="analgesics">Analgesics</button>
+                    <button class="tab-btn" data-tab="muscle-relaxants">Muscle Relaxants</button>
+                    <button class="tab-btn" data-tab="vasoactive">Vasoactive</button>
+                </div>
+                
+                <div class="tab-contents">
+                    <div id="induction" class="tab-content active"></div>
+                    <div id="maintenance" class="tab-content"></div>
+                    <div id="analgesics" class="tab-content"></div>
+                    <div id="muscle-relaxants" class="tab-content"></div>
+                    <div id="vasoactive" class="tab-content"></div>
+                </div>
+            </div>
+            
+            <div class="card export-card">
+                <button id="exportBtn" class="btn btn-secondary">Export Results</button>
+            </div>
+            
+            <div class="card references-card">
+                <h2>References</h2>
+                <ul id="referencesList"></ul>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+    <div id="loading" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Main Application Logic (app.js)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App loaded successfully');
+
+            try {
+                const drugDatabase = {
+                    induction: [
+                        {
+                            name: "Propofol",
+                            inductionDose: (weight, age, asa, bmi) => {
+                                let baseDose = asa >= 4 ? 0.5 : (age > 65 ? 1 : 1.5);
+                                let maxDose = asa >= 4 ? 1 : (age > 65 ? 1.5 : 2.5);
+                                if (bmi > 30) {
+                                    baseDose *= 0.9;
+                                    maxDose *= 0.9;
+                                }
+                                return `${Math.round(weight * baseDose)}-${Math.round(weight * maxDose)} mg (${baseDose}-${maxDose} mg/kg)`;
+                            },
+                            maintenanceDose: (weight, bmi) => {
+                                let minDose = 4;
+                                let maxDose = 12;
+                                if (bmi > 30) {
+                                    minDose *= 0.9;
+                                    maxDose *= 0.9;
+                                }
+                                return `${Math.round(weight * minDose)}-${Math.round(weight * maxDose)} mg/kg/hr (${minDose}-${maxDose} mg/kg/hr)`;
+                            },
+                            preparation: "Use 10 mg/mL (1%) or 20 mg/mL (2%) solution undiluted",
+                            references: ["Miller's Anesthesia, 9th ed."]
+                        },
+                        {
+                            name: "Etomidate",
+                            inductionDose: (weight) => `${Math.round(weight * 0.3)} mg (0.3 mg/kg)`,
+                            preparation: "Use 2 mg/mL solution undiluted",
+                            references: ["Stoelting's Pharmacology & Physiology in Anesthetic Practice"]
+                        }
+                    ],
+                    maintenance: [
+                        {
+                            name: "Sevoflurane",
+                            getMac: (age) => {
+                                if (age < 1) return 3.3;
+                                if (age < 5) return 2.5;
+                                if (age < 40) return 2.0;
+                                if (age < 60) return 1.8;
+                                return 1.4;
+                            },
+                            maintenanceDose: function(age) {
+                                const mac = this.getMac(age);
+                                return `1-2.5% (${(0.7 * mac).toFixed(1)}-${(1.3 * mac).toFixed(1)} MAC)`;
+                            }.bind({ getMac: (age) => drugDatabase.maintenance[0].getMac(age) }),
+                            preparation: "Use specifically designed vaporizer",
+                            references: ["Miller's Anesthesia, 9th ed."]
+                        },
+                        {
+                            name: "Desflurane",
+                            getMac: (age) => {
+                                if (age < 40) return 6.0;
+                                if (age < 60) return 5.2;
+                                return 4.6;
+                            },
+                            maintenanceDose: function(age) {
+                                const mac = this.getMac(age);
+                                return `3-8% (${(0.7 * mac).toFixed(1)}-${(1.3 * mac).toFixed(1)} MAC)`;
+                            }.bind({ getMac: (age) => drugDatabase.maintenance[1].getMac(age) }),
+                            preparation: "Use specifically designed vaporizer",
+                            references: ["Miller's Anesthesia, 9th ed."]
+                        }
+                    ],
+                    analgesics: [
+                        {
+                            name: "Fentanyl",
+                            bolusDose: (weight) => `${Math.round(weight * 1)}-${Math.round(weight * 3)} mcg (1-3 mcg/kg)`,
+                            infusionDose: (weight) => `${Math.round(weight * 0.5)}-${Math.round(weight * 2)} mcg/kg/hr (0.5-2 mcg/kg/hr)`,
+                            preparation: "Dilute to 10-20 mcg/mL in NS or D5W",
+                            references: ["Stoelting's Pharmacology & Physiology in Anesthetic Practice"]
+                        },
+                        {
+                            name: "Morphine",
+                            bolusDose: (weight) => `${Math.round(weight * 0.1)}-${Math.round(weight * 0.2)} mg (0.1-0.2 mg/kg)`,
+                            preparation: "Dilute to 1 mg/mL in NS",
+                            references: ["Stoelting's Pharmacology & Physiology in Anesthetic Practice"]
+                        }
+                    ],
+                    muscleRelaxants: [
+                        {
+                            name: "Rocuronium",
+                            inductionDose: (weight) => `${Math.round(weight * 0.6)} mg (0.6 mg/kg)`,
+                            infusionDose: (weight) => `${Math.round(weight * 0.3)}-${Math.round(weight * 0.6)} mg/kg/hr (5-10 mcg/kg/min)`,
+                            preparation: "For bolus: use undiluted (10 mg/mL). For infusion: dilute to 0.5-1 mg/mL.",
+                            references: ["Miller's Anesthesia, 9th ed."]
+                        },
+                        {
+                            name: "Succinylcholine",
+                            inductionDose: (weight) => `${Math.round(weight * 1)}-${Math.round(weight * 2)} mg (1-2 mg/kg)`,
+                            preparation: "Use undiluted (20 mg/mL)",
+                            references: ["Miller's Anesthesia, 9th ed."]
+                        }
+                    ],
+                    vasoactive: [
+                        {
+                            name: "Phenylephrine",
+                            bolusDose: (weight) => `${Math.round(weight * 0.5)}-${Math.round(weight * 2)} mcg (0.5-2 mcg/kg)`,
+                            infusionDose: (weight) => `${Math.round(weight * 0.1)}-${Math.round(weight * 0.5)} mcg/kg/min`,
+                            preparation: "For infusion: dilute 10 mg in 250 mL NS (40 mcg/mL)",
+                            references: ["Stoelting's Pharmacology & Physiology in Anesthetic Practice"]
+                        },
+                        {
+                            name: "Ephedrine",
+                            bolusDose: (weight) => `${Math.round(weight * 0.1)}-${Math.round(weight * 0.2)} mg (0.1-0.2 mg/kg)`,
+                            preparation: "Use undiluted (50 mg/mL), dilute to 5 mg/mL for bolus",
+                            references: ["Stoelting's Pharmacology & Physiology in Anesthetic Practice"]
+                        }
+                    ]
+                };
+
+                const patientForm = document.getElementById('patientForm');
+                const resultsSection = document.getElementById('resultsSection');
+                const toast = document.getElementById('toast');
+                const loading = document.getElementById('loading');
+                const exportBtn = document.getElementById('exportBtn');
+
+                if (!patientForm || !resultsSection || !toast || !loading || !exportBtn) {
+                    console.error('One or more DOM elements not found');
+                    return;
+                }
+
+                function sanitizeInput(value) {
+                    return String(value).replace(/[<>&;]/g, '');
+                }
+
+                function initTabs() {
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+                        });
+                    });
+                }
+
+                function calculateCategoryDoses(category, age, weight, asa, bmi) {
+                    const drugs = drugDatabase[category];
+                    if (!drugs) return [];
+                    
+                    return drugs.map(drug => {
+                        const result = { name: drug.name, preparation: drug.preparation || '' };
+                        if (drug.inductionDose) result.induction = drug.inductionDose(weight, age, asa, bmi);
+                        if (drug.maintenanceDose) result.maintenance = drug.maintenanceDose(age);
+                        if (drug.bolusDose) result.bolus = drug.bolusDose(weight);
+                        if (drug.infusionDose) result.infusion = drug.infusionDose(weight);
+                        return result;
+                    });
+                }
+
+                function displayResults(results, category) {
+                    const tabContent = document.getElementById(category);
+                    if (!tabContent) return;
+                    
+                    tabContent.innerHTML = results.length === 0 
+                        ? '<p>No drugs available in this category.</p>'
+                        : results.map(drug => `
+                            <div class="drug-card">
+                                <h3><i class="material-icons">medication</i> ${drug.name}</h3>
+                                <div class="dose-info">
+                                    ${drug.induction ? `<div class="dose-item"><h4>Induction Dose</h4><p class="dose-value">${drug.induction}</p></div>` : ''}
+                                    ${drug.maintenance ? `<div class="dose-item"><h4>Maintenance Dose</h4><p class="dose-value">${drug.maintenance}</p></div>` : ''}
+                                    ${drug.bolus ? `<div class="dose-item"><h4>Bolus Dose</h4><p class="dose-value">${drug.bolus}</p></div>` : ''}
+                                    ${drug.infusion ? `<div class="dose-item"><h4>Infusion Rate</h4><p class="dose-value">${drug.infusion}</p></div>` : ''}
+                                </div>
+                                ${drug.preparation ? `<div class="preparation"><h4>Preparation</h4><p>${drug.preparation}</p></div>` : ''}
+                            </div>
+                        `).join('');
+                }
+
+                function updateReferences() {
+                    const referencesList = document.getElementById('referencesList');
+                    if (!referencesList) return;
+                    
+                    const allReferences = new Set();
+                    Object.values(drugDatabase).forEach(category => {
+                        category.forEach(drug => drug.references?.forEach(ref => allReferences.add(ref)));
+                    });
+                    
+                    referencesList.innerHTML = Array.from(allReferences).map(ref => `<li>${ref}</li>`).join('');
+                }
+
+                function showToast(message, type = '') {
+                    if (!toast) return;
+                    toast.textContent = message;
+                    toast.className = `toast ${type}`;
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+
+                function exportResults() {
+                    const content = Array.from(document.querySelectorAll('.tab-content')).map(tab => {
+                        return `${tab.id.toUpperCase()}:\n${Array.from(tab.querySelectorAll('.drug-card')).map(card => {
+                            return `${card.querySelector('h3').textContent}\n${Array.from(card.querySelectorAll('.dose-item')).map(item => 
+                                `${item.querySelector('h4').textContent}: ${item.querySelector('.dose-value').textContent}`).join('\n')}`;
+                        }).join('\n\n')}`;
+                    }).join('\n\n');
+                    
+                    const blob = new Blob([content], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'anesthesia_doses.txt';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+
+                patientForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    loading.style.display = 'flex';
+                    
+                    const age = parseInt(sanitizeInput(document.getElementById('age').value));
+                    const weight = parseFloat(sanitizeInput(document.getElementById('weight').value));
+                    const height = parseInt(sanitizeInput(document.getElementById('height').value));
+                    const sex = sanitizeInput(document.querySelector('input[name="sex"]:checked').value);
+                    const asa = parseInt(sanitizeInput(document.getElementById('asa').value));
+                    
+                    if (isNaN(age) || isNaN(weight) || isNaN(height) || weight <= 0 || age < 0 || height <= 0) {
+                        showToast('Please enter valid patient data', 'error');
+                        loading.style.display = 'none';
+                        return;
+                    }
+                    
+                    const bmi = weight / Math.pow(height / 100, 2);
+                    
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        const categories = ['induction', 'maintenance', 'analgesics', 'muscle-relaxants', 'vasoactive'];
+                        categories.forEach(category => 
+                            displayResults(calculateCategoryDoses(category, age, weight, asa, bmi), category)
+                        );
+                        
+                        updateReferences();
+                        resultsSection.style.display = 'block';
+                        window.scrollTo({ top: resultsSection.offsetTop, behavior: 'smooth' });
+                        showToast('Doses calculated successfully', 'success');
+                    } catch (error) {
+                        console.error('Calculation error:', error);
+                        showToast('Error calculating doses', 'error');
+                    } finally {
+                        loading.style.display = 'none';
+                    }
+                });
+
+                exportBtn.addEventListener('click', exportResults);
+
+                initTabs();
+
+                // Service Worker Registration (simplified for single file)
+                if ('serviceWorker' in navigator) {
+                    const swScript = `
+                        const CACHE_NAME = 'anesthesia-calculator-v1';
+                        const urlsToCache = ['/'];
+
+                        self.addEventListener('install', event => {
+                            event.waitUntil(
+                                caches.open(CACHE_NAME)
+                                    .then(cache => cache.addAll(urlsToCache))
+                            );
+                        });
+
+                        self.addEventListener('fetch', event => {
+                            event.respondWith(
+                                caches.match(event.request)
+                                    .then(response => response || fetch(event.request))
+                            );
+                        });
+
+                        self.addEventListener('activate', event => {
+                            event.waitUntil(
+                                caches.keys().then(cacheNames => {
+                                    return Promise.all(
+                                        cacheNames.filter(name => name !== CACHE_NAME)
+                                            .map(name => caches.delete(name))
+                                    );
+                                })
+                            );
+                        });
+                    `;
+                    const blob = new Blob([swScript], { type: 'application/javascript' });
+                    const url = URL.createObjectURL(blob);
+                    navigator.serviceWorker.register(url)
+                        .then(() => console.log('ServiceWorker registered'))
+                        .catch(err => console.log('ServiceWorker registration failed:', err));
+                }
+            } catch (error) {
+                console.error('Error in app:', error);
+            }
+        });
+
+        // Unit Tests (tests.js)
+        function runTests() {
+            console.log('Running tests...');
+            
+            const testDrug = {
+                inductionDose: (weight, age, asa, bmi) => {
+                    let baseDose = asa >= 4 ? 0.5 : (age > 65 ? 1 : 1.5);
+                    if (bmi > 30) baseDose *= 0.9;
+                    return Math.round(weight * baseDose);
+                }
+            };
+
+            const tests = [
+                {
+                    name: 'Normal adult Propofol dose',
+                    input: { weight: 70, age: 30, asa: 2, bmi: 25 },
+                    expected: 105
+                },
+                {
+                    name: 'Elderly Propofol dose',
+                    input: { weight: 70, age: 70, asa: 2, bmi: 25 },
+                    expected: 70
+                },
+                {
+                    name: 'Obese Propofol dose',
+                    input: { weight: 100, age: 30, asa: 2, bmi: 35 },
+                    expected: 135
+                }
+            ];
+
+            tests.forEach(test => {
+                const result = testDrug.inductionDose(
+                    test.input.weight,
+                    test.input.age,
+                    test.input.asa,
+                    test.input.bmi
+                );
+                console.log(`${test.name}: ${result === test.expected ? 'PASS' : 'FAIL'} (Expected: ${test.expected}, Got: ${result})`);
+            });
+        }
+
+        runTests();
+    </script>
+</body>
+</html>
