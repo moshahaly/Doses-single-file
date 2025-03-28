@@ -133,6 +133,7 @@
         .btn-secondary {
             background: var(--accent);
             color: white;
+            margin-right: 1rem;
         }
 
         .btn-secondary:hover {
@@ -287,6 +288,71 @@
             100% { transform: rotate(360deg); }
         }
 
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav li {
+            margin: 1.5rem 0;
+        }
+
+        .sidebar nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar nav a:hover {
+            color: var(--secondary);
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1002;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.shifted {
+            margin-left: 250px;
+        }
+
+        .about-content {
+            padding: 1.5rem;
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -300,95 +366,131 @@
             .tab-buttons {
                 flex-direction: column;
             }
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content.shifted {
+                margin-left: 200px;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="app-header">
-        <div class="container">
-            <h1><i class="material-icons">calculate</i> Anesthesia Drug Calculator</h1>
-        </div>
-    </header>
+    <button class="menu-btn"><i class="material-icons">menu</i></button>
+    
+    <div class="sidebar">
+        <nav>
+            <ul>
+                <li><a href="#" data-page="calc"><i class="material-icons">calculate</i> Calculator</a></li>
+                <li><a href="#" data-page="references"><i class="material-icons">book</i> References</a></li>
+                <li><a href="#" data-page="about"><i class="material-icons">info</i> About</a></li>
+            </ul>
+        </nav>
+    </div>
 
-    <main class="container">
-        <section class="card input-card">
-            <form id="patientForm" class="form-grid">
-                <div class="form-group">
-                    <label for="age">Age</label>
-                    <input type="number" id="age" min="0" required placeholder="Years">
-                </div>
-                <div class="form-group">
-                    <label for="weight">Weight</label>
-                    <input type="number" id="weight" min="0" step="0.1" required placeholder="kg">
-                </div>
-                <div class="form-group">
-                    <label for="height">Height</label>
-                    <input type="number" id="height" min="0" required placeholder="cm">
-                </div>
-                <div class="form-group">
-                    <label>Sex</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="sex" value="male" id="male" checked>
-                            <span>Male</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="sex" value="female" id="female">
-                            <span>Female</span>
-                        </label>
+    <div class="main-content">
+        <header class="app-header">
+            <div class="container">
+                <h1><i class="material-icons">calculate</i> Anesthesia Drug Calculator</h1>
+            </div>
+        </header>
+
+        <main class="container">
+            <section id="calc-page" class="page active">
+                <section class="card input-card">
+                    <form id="patientForm" class="form-grid">
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" min="0" required placeholder="Years">
+                        </div>
+                        <div class="form-group">
+                            <label for="weight">Weight</label>
+                            <input type="number" id="weight" min="0" step="0.1" required placeholder="kg">
+                        </div>
+                        <div class="form-group">
+                            <label for="height">Height</label>
+                            <input type="number" id="height" min="0" required placeholder="cm">
+                        </div>
+                        <div class="form-group">
+                            <label>Sex</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sex" value="male" id="male" checked>
+                                    <span>Male</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sex" value="female" id="female">
+                                    <span>Female</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="asa">ASA Status</label>
+                            <select id="asa" required>
+                                <option value="1">1 - Normal healthy</option>
+                                <option value="2">2 - Mild systemic disease</option>
+                                <option value="3">3 - Severe systemic disease</option>
+                                <option value="4">4 - Severe life-threatening</option>
+                                <option value="5">5 - Moribund</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="calculateBtn" class="btn btn-primary">Calculate Doses</button>
+                    </form>
+                </section>
+
+                <section id="resultsSection" class="results-section" style="display: none;">
+                    <div class="tab-container">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="induction">Induction</button>
+                            <button class="tab-btn" data-tab="maintenance">Maintenance</button>
+                            <button class="tab-btn" data-tab="analgesics">Analgesics</button>
+                            <button class="tab-btn" data-tab="muscle-relaxants">Muscle Relaxants</button>
+                            <button class="tab-btn" data-tab="vasoactive">Vasoactive</button>
+                        </div>
+                        
+                        <div class="tab-contents">
+                            <div id="induction" class="tab-content active"></div>
+                            <div id="maintenance" class="tab-content"></div>
+                            <div id="analgesics" class="tab-content"></div>
+                            <div id="muscle-relaxants" class="tab-content"></div>
+                            <div id="vasoactive" class="tab-content"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="asa">ASA Status</label>
-                    <select id="asa" required>
-                        <option value="1">1 - Normal healthy</option>
-                        <option value="2">2 - Mild systemic disease</option>
-                        <option value="3">3 - Severe systemic disease</option>
-                        <option value="4">4 - Severe life-threatening</option>
-                        <option value="5">5 - Moribund</option>
-                    </select>
-                </div>
-                <button type="submit" id="calculateBtn" class="btn btn-primary">Calculate Doses</button>
-            </form>
-        </section>
+                    
+                    <div class="card export-card">
+                        <button id="exportTxtBtn" class="btn btn-secondary">Export as Text</button>
+                        <button id="exportPdfBtn" class="btn btn-secondary">Export as PDF</button>
+                    </div>
+                </section>
+            </section>
 
-        <section id="resultsSection" class="results-section" style="display: none;">
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-tab="induction">Induction</button>
-                    <button class="tab-btn" data-tab="maintenance">Maintenance</button>
-                    <button class="tab-btn" data-tab="analgesics">Analgesics</button>
-                    <button class="tab-btn" data-tab="muscle-relaxants">Muscle Relaxants</button>
-                    <button class="tab-btn" data-tab="vasoactive">Vasoactive</button>
+            <section id="references-page" class="page" style="display: none;">
+                <div class="card references-card">
+                    <h2>References</h2>
+                    <ul id="referencesList"></ul>
                 </div>
-                
-                <div class="tab-contents">
-                    <div id="induction" class="tab-content active"></div>
-                    <div id="maintenance" class="tab-content"></div>
-                    <div id="analgesics" class="tab-content"></div>
-                    <div id="muscle-relaxants" class="tab-content"></div>
-                    <div id="vasoactive" class="tab-content"></div>
+            </section>
+
+            <section id="about-page" class="page" style="display: none;">
+                <div class="card about-content">
+                    <h2>About</h2>
+                    <p>Version: 1.0.0</p>
+                    <p>Created by: Mohamed Elshahaly, 2025</p>
+                    <p>This application provides calculated doses for common anesthesia drugs based on patient parameters.</p>
                 </div>
-            </div>
-            
-            <div class="card export-card">
-                <button id="exportBtn" class="btn btn-secondary">Export Results</button>
-            </div>
-            
-            <div class="card references-card">
-                <h2>References</h2>
-                <ul id="referencesList"></ul>
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
 
     <div id="toast" class="toast"></div>
     <div id="loading" class="loading-overlay" style="display: none;">
         <div class="spinner"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        // Main Application Logic (app.js)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('App loaded successfully');
 
@@ -508,9 +610,13 @@
                 const resultsSection = document.getElementById('resultsSection');
                 const toast = document.getElementById('toast');
                 const loading = document.getElementById('loading');
-                const exportBtn = document.getElementById('exportBtn');
+                const exportTxtBtn = document.getElementById('exportTxtBtn');
+                const exportPdfBtn = document.getElementById('exportPdfBtn');
+                const sidebar = document.querySelector('.sidebar');
+                const menuBtn = document.querySelector('.menu-btn');
+                const mainContent = document.querySelector('.main-content');
 
-                if (!patientForm || !resultsSection || !toast || !loading || !exportBtn) {
+                if (!patientForm || !resultsSection || !toast || !loading || !exportTxtBtn || !exportPdfBtn || !sidebar || !menuBtn || !mainContent) {
                     console.error('One or more DOM elements not found');
                     return;
                 }
@@ -584,7 +690,7 @@
                     setTimeout(() => toast.classList.remove('show'), 3000);
                 }
 
-                function exportResults() {
+                function exportToText() {
                     const content = Array.from(document.querySelectorAll('.tab-content')).map(tab => {
                         return `${tab.id.toUpperCase()}:\n${Array.from(tab.querySelectorAll('.drug-card')).map(card => {
                             return `${card.querySelector('h3').textContent}\n${Array.from(card.querySelectorAll('.dose-item')).map(item => 
@@ -599,6 +705,36 @@
                     a.download = 'anesthesia_doses.txt';
                     a.click();
                     URL.revokeObjectURL(url);
+                }
+
+                function exportToPDF() {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    let y = 10;
+
+                    doc.setFontSize(16);
+                    doc.text('Anesthesia Drug Calculations', 10, y);
+                    y += 10;
+
+                    doc.setFontSize(12);
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        doc.text(tab.id.toUpperCase(), 10, y);
+                        y += 7;
+
+                        tab.querySelectorAll('.drug-card').forEach(card => {
+                            doc.text(card.querySelector('h3').textContent, 15, y);
+                            y += 5;
+
+                            card.querySelectorAll('.dose-item').forEach(item => {
+                                const text = `${item.querySelector('h4').textContent}: ${item.querySelector('.dose-value').textContent}`;
+                                doc.text(text, 20, y);
+                                y += 5;
+                            });
+                            y += 5;
+                        });
+                    });
+
+                    doc.save('anesthesia_doses.pdf');
                 }
 
                 patientForm.addEventListener('submit', async function(e) {
@@ -639,15 +775,36 @@
                     }
                 });
 
-                exportBtn.addEventListener('click', exportResults);
+                exportTxtBtn.addEventListener('click', exportToText);
+                exportPdfBtn.addEventListener('click', exportToPDF);
+
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    mainContent.classList.toggle('shifted');
+                });
+
+                document.querySelectorAll('.sidebar a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.getAttribute('data-page');
+                        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+                        document.getElementById(`${page}-page`).style.display = 'block';
+                        sidebar.classList.remove('open');
+                        mainContent.classList.remove('shifted');
+                    });
+                });
 
                 initTabs();
 
-                // Service Worker Registration (simplified for single file)
                 if ('serviceWorker' in navigator) {
                     const swScript = `
-                        const CACHE_NAME = 'anesthesia-calculator-v1';
-                        const urlsToCache = ['/'];
+                        const CACHE_NAME = 'anesthesia-calculator-v2';
+                        const urlsToCache = [
+                            '/',
+                            'https://fonts.googleapis.com/icon?family=Material+Icons',
+                            'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+                            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+                        ];
 
                         self.addEventListener('install', event => {
                             event.waitUntil(
@@ -659,7 +816,16 @@
                         self.addEventListener('fetch', event => {
                             event.respondWith(
                                 caches.match(event.request)
-                                    .then(response => response || fetch(event.request))
+                                    .then(response => {
+                                        const fetchPromise = fetch(event.request).then(networkResponse => {
+                                            if (networkResponse) {
+                                                const cache = caches.open(CACHE_NAME);
+                                                cache.then(c => c.put(event.request, networkResponse.clone()));
+                                                return networkResponse;
+                                            }
+                                        });
+                                        return response || fetchPromise;
+                                    })
                             );
                         });
 
@@ -685,7 +851,6 @@
             }
         });
 
-        // Unit Tests (tests.js)
         function runTests() {
             console.log('Running tests...');
             
